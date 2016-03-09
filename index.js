@@ -36,7 +36,7 @@ var TVApi = function (args) {
 inherits(TVApi, Generic);
 
 TVApi.prototype.config = {
-    name: 'tvapi',
+    name: 'TVApi',
     uniqueId: 'tvdb_id',
     tabName: 'TVApi',
     type: 'tvshow',
