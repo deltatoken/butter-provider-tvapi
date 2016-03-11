@@ -6,7 +6,6 @@ var _ = require('lodash');
 var inherits = require('util').inherits;
 var Generic = require('butter-provider');
 var sanitize = require('butter-sanitize');
-var txtAPI = require('popcorn-txt-api');
 
 var tvApiServer;
 
@@ -27,9 +26,7 @@ var TVApi = function (args) {
     TVApi.super_.call(this);
 
     if (args.apiURL)
-        this.apiURL = Q.all(_.map(args.apiURL.split(','), function (url){
-            return txtAPI(url);
-        }));
+        this.apiURL = args.apiURL.split(',');
 
     this.quality = args.quality;
     this.translate = args.translate;
@@ -74,24 +71,24 @@ TVApi.prototype.fetch = function (filters) {
         params.sort = filters.sorter;
     }
 
-    function get(apis, index) {
+    function get(index) {
         var options = {
-            url: apis[index] + 'shows/' + filters.page + '?' + querystring.stringify(params).replace(/%25%20/g, '%20'),
+            url: that.apiURL[index] + 'shows/' + filters.page + '?' + querystring.stringify(params).replace(/%25%20/g, '%20'),
             json: true
         };
 
-	tvApiServer = apis[index];
+	tvApiServer = that.apiURL[index];
 	//document.getElementById('TVApi').setAttribute('data-original-title', tvApiServer);
 
-        var req = _.extend({}, apis[index], options);
+        var req = _.extend({}, that.apiURL[index], options);
         console.info('Request to TVApi', req.url);
         request(req, function (err, res, data) {
             if (err || res.statusCode >= 400) {
-                console.warn('TVAPI endpoint \'%s\' failed.', apis[index]);
-                if (index + 1 >= apis.length) {
+                console.warn('TVAPI endpoint \'%s\' failed.', that.apiURL[index]);
+                if (index + 1 >= that.apiURL.length) {
                     return deferred.reject(err || 'Status Code is above 400');
                 } else {
-                    get(apis, index + 1);
+                    get(index + 1);
                 }
                 return;
             } else if (!data || (data.error && data.error !== 'No movies found')) {
@@ -110,9 +107,7 @@ TVApi.prototype.fetch = function (filters) {
             }
         });
     }
-    this.apiURL.then(function(apis) {
-        get(apis, 0)
-    });
+    get(0);
 
     return deferred.promise;
 };
@@ -123,21 +118,21 @@ TVApi.prototype.detail = function (torrent_id, old_data, debug) {
     debug === undefined ? debug = true : '';
     return Q.Promise(function (resolve, reject) {
 
-        function get(apis, index) {
+        function get(index) {
             var options = {
-                url: apis[index] + 'show/' + torrent_id,
+                url: that.apiURL[index] + 'show/' + torrent_id,
                 json: true
             };
             //	    document.getElementById('TVApi').setAttribute('data-original-title', tvApiServer);
-            var req = _.extend({}, apis[index], options);
+            var req = _.extend({}, that.apiURL[index], options);
             console.info('Request to TVApi', req.url);
             request(req, function (error, response, data) {
                 if (error || response.statusCode >= 400) {
-                    console.warn('TVAPI endpoint \'%s\' failed.', apis[index]);
-                    if (index + 1 >= apis.length) {
+                    console.warn('TVAPI endpoint \'%s\' failed.', that.apiURL[index]);
+                    if (index + 1 >= that.apiURL.length) {
                         return reject(error || 'Status Code is above 400');
                     } else {
-                        get(apis, index + 1);
+                        get(index + 1);
                     }
                     return;
                 } else if (!data || (data.error && data.error !== 'No data returned') || data.episodes.length === 0) {
@@ -195,9 +190,7 @@ TVApi.prototype.detail = function (torrent_id, old_data, debug) {
                 }
             });
         }
-        this.apiURL.then(function(apis) {
-            get(apis, 0)
-        });
+        get(0);
     });
 };
 
