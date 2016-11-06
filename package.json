@@ -28,7 +28,7 @@
     "butter-provider": "^0.3.1",
     "butter-sanitize": "^0.1.0",
     "lodash": "^3.10.1",
-    "node-tvdb": "^1.6.1",
+    "node-tvdb": "^2.0.7",
     "popcorn-txt-api": "0.0.5",
     "q": "^1.4.1"
   },
