@@ -1,6 +1,6 @@
 {
   "name": "butter-provider-tvapi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Butter provider for TV API",
   "main": "index.js",
   "butter": {
@@ -25,10 +25,10 @@
   },
   "homepage": "https://github.com/butterproviders/butter-provider-tvapi#readme",
   "dependencies": {
-    "butter-provider": "^0.3.1",
+    "butter-provider": "^0.4.0",
     "butter-sanitize": "^0.1.0",
-    "lodash": "^3.10.1",
-    "node-tvdb": "^2.0.7",
+    "lodash": "^4.17.1",
+    "node-tvdb": "^2.0.18",
     "popcorn-txt-api": "0.0.5",
     "q": "^1.4.1"
   },
