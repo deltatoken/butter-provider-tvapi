@@ -1,38 +1,29 @@
 {
   "name": "butter-provider-tvapi",
-  "version": "0.1.1",
-  "description": "A Butter provider for TV API",
+  "version": "1.0.0",
+  "description": "A  Butter provider for tv shows, completable with the popcorn-api.",
   "main": "index.js",
   "butter": {
-    "testArgs": "tvapi?&apiURL=https://api-fetch.website/tv/,dnstxt://_movies.api-fetch.website/tv"
+    "timeout": 20000,
+    "testArgs": "TVApi?&apiURL=https://tv-v2.api-fetch.website/,cloudflare+https://tv-v2.api-fetch.website,http://localhost:5000/"
   },
   "scripts": {
     "test": "tape ./node_modules/butter-test-provider/tests/*"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/butterproviders/butter-provider-tvapi.git"
-  },
-  "keywords": [
-    "tvapi",
-    "butter",
-    "streaming"
-  ],
-  "author": "Niv Sardi",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/butterproviders/butter-provider-tvapi/issues"
-  },
-  "homepage": "https://github.com/butterproviders/butter-provider-tvapi#readme",
+  "license": "MIT",
   "dependencies": {
-    "butter-provider": "^0.4.0",
-    "butter-sanitize": "^0.1.0",
-    "lodash": "^4.17.1",
-    "node-tvdb": "^2.0.18",
-    "popcorn-txt-api": "0.0.5",
+    "butter-provider": "^0.5.1",
+    "butter-sanitize": "^0.1.1",
+    "lodash": "^4.17.2",
+    "node-tvdb": "^2.0.20",
     "q": "^1.4.1"
   },
   "devDependencies": {
-    "butter-test-provider": "0.0.3"
+    "butter-test-provider": "0.0.5",
+    "tape": "^4.6.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/butterproviders/butter-provider-tvapi.git"
   }
 }
