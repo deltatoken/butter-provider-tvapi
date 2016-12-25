@@ -19,7 +19,7 @@
     "q": "^1.4.1"
   },
   "devDependencies": {
-    "butter-test-provider": "0.0.5",
+    "butter-test-provider": "git+https://github.com/butterproviders/butter-test-provider",
     "tape": "^4.6.3"
   },
   "repository": {
