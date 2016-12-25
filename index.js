@@ -125,6 +125,7 @@ TVApi.prototype.fetch = function(filters) {
 	return get(index, url, that).then(function(data) {
 		data = data.map(function(entry) {
 			entry.type = Generic.ItemType.TVSHOW;
+      data.subtitle = {};
 			entry.backdrop = entry.images.fanart;
 			entry.poster = entry.images.poster;
 
@@ -146,6 +147,7 @@ TVApi.prototype.detail = function(torrent_id, old_data, debug) {
 
 	return get(index, url, that).then(function(data) {
     data.type = Generic.ItemType.TVSHOW;
+    data.subtitle = {};
     data.backdrop = data.images.fanart;
     data.poster = data.images.poster;
 
