@@ -124,7 +124,7 @@ TVApi.prototype.fetch = function(filters) {
 	var url = that.apiURL[index] + 'shows/' + filters.page + '?' + querystring.stringify(params).replace(/%25%20/g, '%20');
 	return get(index, url, that).then(function(data) {
 		data = data.map(function(entry) {
-			entry.type = Generic.ItemType.SHOW;
+			entry.type = Generic.ItemType.TVSHOW;
 			entry.backdrop = entry.images.fanart;
 			entry.poster = entry.images.poster;
 
@@ -145,7 +145,7 @@ TVApi.prototype.detail = function(torrent_id, old_data, debug) {
 	var url = that.apiURL[index] + 'show/' + torrent_id;
 
 	return get(index, url, that).then(function(data) {
-    data.type = Generic.ItemType.SHOW;
+    data.type = Generic.ItemType.TVSHOW;
     data.backdrop = data.images.fanart;
     data.poster = data.images.poster;
 
