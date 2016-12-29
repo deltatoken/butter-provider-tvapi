@@ -8,20 +8,20 @@ var querystring = require('querystring');
 var request = require('request');
 var sanitize = require('butter-sanitize');
 
-var TVApi = function(args) {
-	if (!(this instanceof TVApi)) return new TVApi(args);
+var TVShowApi = function(args) {
+	if (!(this instanceof TVShowApi)) return new TVShowApi(args);
 
 	Generic.call(this, args);
 
 	this.apiURL = this.args.apiURL || ['https://tv-v2.api-fetch.website/'];
 };
 
-inherits(TVApi, Generic);
+inherits(TVShowApi, Generic);
 
-TVApi.prototype.config = {
-	name: 'TVApi',
+TVShowApi.prototype.config = {
+	name: 'TVShowApi',
 	uniqueId: 'imdb_id',
-	tabName: 'TVApi',
+	tabName: 'TVShowApi',
 	args: {
 		apiURL: Generic.ArgType.ARRAY,
     translate: Generic.ArgType.STRING,
@@ -93,10 +93,10 @@ function get(index, url, that) {
 	};
 
 	var req = processCloudFlareHack(options, that.apiURL[index]);
-	console.info('Request to TVApi', req.url);
+	console.info('Request to TVShowApi', req.url);
 	request(req, function(err, res, data) {
 		if (err || res.statusCode >= 400) {
-			console.warn('TVApi endpoint \'%s\' failed.', that.apiURL[index]);
+			console.warn('TVShowApi endpoint \'%s\' failed.', that.apiURL[index]);
 			if (index + 1 >= that.apiURL.length) {
 				return deferred.reject(err || 'Status Code is above 400');
 			} else {
@@ -104,7 +104,7 @@ function get(index, url, that) {
 			}
 		} else if (!data || data.error) {
 			err = data ? data.status_message : 'No data returned';
-			console.error('TVApi error:', err);
+			console.error('TVShowApi error:', err);
 			return deferred.reject(err);
 		} else {
 			return deferred.resolve(data);
@@ -114,11 +114,11 @@ function get(index, url, that) {
 	return deferred.promise;
 };
 
-TVApi.prototype.extractIds = function(items) {
+TVShowApi.prototype.extractIds = function(items) {
 	return _.map(items.results, this.config.uniqueId);
 };
 
-TVApi.prototype.fetch = function(filters) {
+TVShowApi.prototype.fetch = function(filters) {
 	var that = this;
 
 	var params = {};
@@ -148,18 +148,18 @@ TVApi.prototype.fetch = function(filters) {
 	return get(index, url, that).then(formatFetch);
 };
 
-TVApi.prototype.detail = function(torrent_id, old_data, debug) {
+TVShowApi.prototype.detail = function(torrent_id, old_data, debug) {
 	var that = this;
 	var index = 0;
 	var url = that.apiURL[index] + 'show/' + torrent_id;
 	return get(index, url, that).then(formatDetail);
 };
 
-TVApi.prototype.random = function () {
+TVShowApi.prototype.random = function () {
 	var that = this;
 	var index = 0;
 	var url = that.apiURL[index] + 'random/show';
 	return get(index, url, that).then(formatDetail);
 };
 
-module.exports = TVApi;
+module.exports = TVShowApi;

@@ -1,11 +1,11 @@
 {
-  "name": "butter-provider-tvapi",
+  "name": "butter-provider-tvshows",
   "version": "1.0.0",
   "description": "A  Butter provider for tv shows, completable with the popcorn-api.",
   "main": "index.js",
   "butter": {
     "timeout": 20000,
-    "testArgs": "TVApi?&apiURL=https://tv-v2.api-fetch.website/,cloudflare+https://tv-v2.api-fetch.website/,http://localhost:5000/"
+    "testArgs": "TVShowApi?&apiURL=https://tv-v2.api-fetch.website/,cloudflare+https://tv-v2.api-fetch.website/,http://localhost:5000/"
   },
   "scripts": {
     "test": "tape ./node_modules/butter-provider/tests/*"
@@ -24,6 +24,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/butterproviders/butter-provider-tvapi.git"
+    "url": "git+https://github.com/butterproviders/butter-provider-tvshows.git"
   }
 }
