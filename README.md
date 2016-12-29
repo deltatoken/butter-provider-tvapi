@@ -1,6 +1,6 @@
-# Butter Provider TV
+# Butter Provider Shows
 
-[![Build Status](https://travis-ci.org/ChrisAlderson/butter-provider-tvapi.svg?branch=master)](https://travis-ci.org/ChrisAlderson/butter-provider-tvapi)
+[![Build Status](https://travis-ci.org/ChrisAlderson/butter-provider-tvshows.svg?branch=master)](https://travis-ci.org/ChrisAlderson/butter-provider-tvshows)
 
 A  Butter provider for tv shows, completable with the [popcorn-api](https://github.com/popcorn-official/popcorn-api).
 
