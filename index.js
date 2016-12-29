@@ -1,7 +1,6 @@
 'use strict';
 
 var _ = require('lodash');
-var Client = require('node-tvdb');
 var Generic = require('butter-provider');
 var inherits = require('util').inherits;
 var Q = require('q');
@@ -9,35 +8,20 @@ var querystring = require('querystring');
 var request = require('request');
 var sanitize = require('butter-sanitize');
 
-var tvdb = new Client('7B95D15E1BE1D75A');
-
 var TVApi = function(args) {
 	if (!(this instanceof TVApi)) return new TVApi(args);
-
-	var that = this;
-	try {
-		tvdb.getLanguages().then(function(langlist) {
-			that.TVDBLangs = langlist
-		});
-	} catch (e) {
-		that.TVDBLangs = false
-		console.warn('Something went wrong with TVDB, overviews can\'t be translated.');
-	}
 
 	Generic.call(this, args);
 
 	this.apiURL = this.args.apiURL || ['https://tv-v2.api-fetch.website/'];
-	this.translate = args.translate;
-	this.language = args.language;
 };
 
 inherits(TVApi, Generic);
 
 TVApi.prototype.config = {
 	name: 'TVApi',
-	uniqueId: 'tvdb_id',
+	uniqueId: 'imdb_id',
 	tabName: 'TVApi',
-	type: Generic.TabType.TVSHOW,
 	args: {
 		apiURL: Generic.ArgType.ARRAY,
     translate: Generic.ArgType.STRING,
@@ -45,6 +29,45 @@ TVApi.prototype.config = {
 	},
 	metadata: 'trakttv:show-metadata'
 };
+
+function formatFetch(shows) {
+  var results = _.map(shows, function(show) {
+    return {
+      imdb_id: show.imdb_id,
+      title: show.title,
+      year: show.year,
+      genres: show.genres,
+      rating: parseInt(show.rating.percentage, 10) / 10,
+      poster: show.images.poster,
+      type: Generic.ItemType.TVSHOW,
+      num_seasons: show.num_seasons
+    }
+  });
+
+  return {
+    results: sanitize(results),
+    hasMore: true
+  };
+}
+
+function formatDetail(show) {
+  return {
+    imdb_id: show.imdb_id,
+    title: show.title,
+    year: show.year,
+    genres: show.genres,
+    rating: parseInt(show.rating.percentage, 10) / 10,
+    poster: show.images.poster,
+    type: Generic.ItemType.TVSHOW,
+    num_seasons: show.num_seasons,
+    runtime: show.runtime,
+    backdrop: show.images.fanart,
+    subtitle: {},
+    synopsis: show.synopsis,
+    status: show.status,
+    episodes: show.episodes
+  };
+}
 
 function processCloudFlareHack(options, url) {
 	var req = options;
@@ -59,7 +82,7 @@ function processCloudFlareHack(options, url) {
 		});
 	}
 	return req;
-};
+}
 
 function get(index, url, that) {
 	var deferred = Q.defer();
@@ -92,7 +115,7 @@ function get(index, url, that) {
 };
 
 TVApi.prototype.extractIds = function(items) {
-	return _.map(items.results, 'imdb_id');
+	return _.map(items.results, this.config.uniqueId);
 };
 
 TVApi.prototype.fetch = function(filters) {
@@ -122,77 +145,21 @@ TVApi.prototype.fetch = function(filters) {
 
 	var index = 0;
 	var url = that.apiURL[index] + 'shows/' + filters.page + '?' + querystring.stringify(params).replace(/%25%20/g, '%20');
-	return get(index, url, that).then(function(data) {
-		data = data.map(function(entry) {
-			entry.type = Generic.ItemType.TVSHOW;
-      entry.subtitle = {};
-			entry.backdrop = entry.images.fanart;
-			entry.poster = entry.images.poster;
-
-      return entry;
-		});
-
-		return {
-			results: sanitize(data),
-			hasMore: true
-		};
-	});
+	return get(index, url, that).then(formatFetch);
 };
 
 TVApi.prototype.detail = function(torrent_id, old_data, debug) {
 	var that = this;
-
 	var index = 0;
 	var url = that.apiURL[index] + 'show/' + torrent_id;
+	return get(index, url, that).then(formatDetail);
+};
 
-	return get(index, url, that).then(function(data) {
-    data.type = Generic.ItemType.TVSHOW;
-    data.subtitle = {};
-    data.genre = data.genres;
-    data.backdrop = data.images.fanart;
-    data.poster = data.images.poster;
-
-		if (that.translate && that.language !== 'en') {
-			var langAvailable;
-			for (var x = 0; x < that.TVDBLangs.length; x++) {
-				if (that.TVDBLangs[x].abbreviation.indexOf(that.language) > -1) {
-					langAvailable = true;
-					break;
-				}
-			}
-
-			if (!langAvailable) {
-				return sanitize(data);
-			} else {
-				var reqTimeout = setTimeout(function() {
-					return sanitize(data);
-				}, 2000);
-
-				console.info('Request to TVDB API: \'%s\' - %s', old_data.title, that.language);
-				tvdb.getSeriesAllById(old_data.tvdb_id).then(function(localization) {
-					clearTimeout(reqTimeout);
-					_.extend(data, {
-						synopsis: localization.Overview
-					});
-
-					for (var i = 0; i < localization.Episodes.length; i++) {
-						for (var j = 0; j < data.episodes.length; j++) {
-							if (localization.Episodes[i].id.toString() === data.episodes[j].tvdb_id.toString()) {
-								data.episodes[j].overview = localization.Episodes[i].Overview;
-								break;
-							}
-						}
-					}
-
-					return sanitize(data);
-				}).catch(function(error) {
-					return sanitize(data);
-				});
-			}
-		} else {
-			return sanitize(data);
-		}
-	});
+TVApi.prototype.random = function () {
+	var that = this;
+	var index = 0;
+	var url = that.apiURL[index] + 'random/show';
+	return get(index, url, that).then(formatDetail);
 };
 
 module.exports = TVApi;
